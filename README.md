@@ -13,7 +13,7 @@ The system is composed of three distinct services operating asynchronously.
    * An **API Server** exposes RESTful endpoints for the frontend to consume, including a semantic search endpoint powered by vector similarity.  
 3. **Frontend (`/frontend`):** A **React** single-page application built with **Vite**. Provides the user interface for data visualization and interaction.
 
-(TODO: Screenshot)
+<img width="1675" alt="Screenshot 2025-06-29 at 11 37 17 PM" src="https://github.com/user-attachments/assets/73322bff-2584-476a-a52e-8a28e02b622f" />
 
 ### **Tech Stack**
 
