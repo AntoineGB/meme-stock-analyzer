@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback, Fragment } from "react";
 import {
   Container,
   Text,
@@ -9,18 +10,16 @@ import {
   SimpleGrid,
   Icon,
   Box,
-  Alert,
   Flex,
 } from "@chakra-ui/react";
-import { useState, useEffect, Fragment } from "react";
 import axios from "axios";
 import { HiX } from "react-icons/hi";
 import MemeCard from "./components/MemeCard";
 import SearchBar from "./components/SearchBar";
+import ErrorFallback from "./components/ErrorFallback";
 
-// Define the base URL for our API.
-// Your FastAPI server is running on port 8000 by default.
-const API_URL = "http://127.0.0.1:8000";
+// Deployed Fargate container's public IP
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [memes, setMemes] = useState([]);
@@ -31,31 +30,34 @@ function App() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const fetchMemes = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get(`${API_URL}/memes?limit=50`);
+      setMemes(response.data);
+    } catch (err) {
+      setError(
+        "Could not connect to the analytics server. It might be offline or starting up."
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // fetch data when the component mounts
   useEffect(() => {
-    const fetchMemes = async () => {
-      try {
-        // GET request to our /memes endpoint
-        const response = await axios.get(`${API_URL}/memes`);
-        setMemes(response.data); // Store the fetched memes in state
-      } catch (err) {
-        setError("Failed to fetch memes. Is the backend server running?");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchMemes();
-  }, []);
+  }, [fetchMemes]);
 
   const handleSearch = async (query) => {
     setIsSearching(true);
-    setSearchQuery(query);
     setError(null);
     try {
       const response = await axios.post(`${API_URL}/search`, { query });
       setSearchResults(response.data);
+      setSearchQuery(query);
     } catch (err) {
       setError("Search failed. Please try again.");
       console.error(err);
@@ -67,9 +69,14 @@ function App() {
   const clearSearch = () => {
     setSearchResults([]);
     setSearchQuery("");
+    setError(null);
   };
 
   const renderContent = () => {
+    if (error && !isSearching) {
+      return <ErrorFallback message={error} onRetry={fetchMemes} />;
+    }
+
     if (loading) {
       return (
         <Box
@@ -87,7 +94,7 @@ function App() {
             justifyContent={"center"}
           >
             <Spinner size="md" color="cyan.400" />
-            <Text size="sm" color="#8899A6">
+            <Text size="sm" fontWeight={"bolder"} color="#8899A6">
               Loading Memes...
             </Text>
           </HStack>
@@ -96,17 +103,20 @@ function App() {
     }
 
     if (error) {
-      return (
-        <Alert status="error" borderRadius="md">
-          {error}
-        </Alert>
-      );
+      return <ErrorFallback message={error} onRetry={fetchMemes} />;
     }
+
+    // If a search failed, show a small alert above the search bar, but don't replace the page.
+    const searchErrorAlert =
+      error && isSearching ? (
+        <ErrorFallback message={error} onRetry={fetchMemes} />
+      ) : null;
 
     const memesToDisplay = searchQuery ? searchResults : memes;
 
     return (
       <Fragment>
+        {searchErrorAlert}
         {searchQuery && (
           <Box alignSelf="flex-start" mb={4}>
             <HStack color="#8899A6">
@@ -118,7 +128,7 @@ function App() {
                 color="cyan.500"
                 p="3"
                 size={"sm"}
-                borderRadius={"xl"}
+                borderRadius={"lg"}
                 outline={"none"}
                 bg={"#22303C"}
                 fontWeight={"600"}
@@ -133,18 +143,16 @@ function App() {
         )}
         {memesToDisplay.length > 0 ? (
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3, xl: 4 }} gap={8}>
-            {memesToDisplay.map((meme) => {
-              return (
-                <MemeCard
-                  key={meme.id}
-                  title={meme.title}
-                  imageUrl={meme.image_url}
-                  hypeScore={meme.hype_score}
-                  score={meme.score}
-                  numComments={meme.num_comments}
-                />
-              );
-            })}
+            {memesToDisplay.map((meme) => (
+              <MemeCard
+                key={meme.id}
+                title={meme.title}
+                imageUrl={meme.image_url}
+                hypeScore={meme.hype_score}
+                score={meme.score}
+                numComments={meme.num_comments}
+              />
+            ))}
           </SimpleGrid>
         ) : (
           <Box
@@ -198,7 +206,7 @@ function App() {
       color={"white"}
     >
       <Container pb={4}>
-        <VStack position={"relative"} width="100%" align={"start"}>
+        <VStack position={"relative"} width="100%" align={"center"}>
           <Flex
             position={"sticky"}
             zIndex={40}

@@ -1,12 +1,48 @@
-# React + Vite
+# **Service: Frontend**
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This service is the user interface. It's a `React` single-page application built with `Vite` and styled with `Chakra UI`.
 
-Currently, two official plugins are available:
+### **Features**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+* Displays a grid of memes fetched from the backend API.  
+* Default view is sorted by "hype score" to show the most relevant content first.  
+* Features a search bar for performing semantic searches.  
+* Handles loading and error states gracefully.  
 
-## Expanding the ESLint configuration
+### **Local Execution**
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Prerequisites: Node.js v16+, `npm`.
+
+1. **Install Dependencies:**  
+   ```
+   # From within the /frontend directory  
+   npm install
+   ```
+
+2. **Configure Environment:**  
+   The API URL is managed via an environment file. Copy the example and modify if needed.  
+   ```
+   cp .env.example .env
+   ```
+
+   By default, `VITE_API_URL` points **ALREADY** to my deployed-backend-service public IP.
+
+   > [!IMPORTANT]  
+   > If you want to make local development in the backend, then modify `VITE_API_URL` to
+   > your loopback address `127.0.0.1:8000`
+3. **Run the Development Server:**  
+   ```
+   npm run dev
+   ```
+
+   The application will be available at `http://localhost:5173`.
+
+
+### **Production Build**
+
+To create an optimized production build:  
+```
+npm run build
+```
+
+The output will be in the /dist directory, ready for static hosting.

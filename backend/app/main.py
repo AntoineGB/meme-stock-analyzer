@@ -20,9 +20,7 @@ app = FastAPI(
 )
 
 # CORS middleware block
-origins = [
-    "http://localhost:5173", # Our React App
-]
+origins = ["*"] # allowing all origins
 
 app.add_middleware(
     CORSMiddleware,

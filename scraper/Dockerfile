@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 RUN apt-get update && apt-get install -y build-essential
 
 # Copying the requirements file into the container and install dependencies
-# Step done first to leverage Docker's layer caching
+# Done first to leverage Docker's layer caching
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
