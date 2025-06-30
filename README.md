@@ -1,4 +1,4 @@
-# **Meme Stock Analyser Platform**
+# **Meme Stock Analyzer Platform**
 
 An end-to-end, full-stack application for scraping, analyzing, and serving data on meme popularity trends. This project serves as a technical demonstration of a modern, decoupled, cloud-native architecture.  
 The premise is a parody of financial analytics, applied to the ephemeral and chaotic market of internet memes.
